@@ -96,6 +96,17 @@
     }
     .btn:hover { border-color: var(--accent); }
     .btn-icon { padding: 0.5rem; border-radius: 0.5rem; }
+    
+    /* Синяя кнопка для полноэкранного режима */
+    .btn.btn-blue {
+      background-color: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .btn.btn-blue:hover {
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
 
     /* Horizontal Scroll Tabs */
     .tabs-wrapper {
@@ -227,12 +238,13 @@
       animation: pulse 2s infinite;
     }
 
-    /* Стили для подсказки с номером темы на обратной стороне карточки */
+    /* Лаконичная подсказка с номером темы */
     .card-topic-hint {
       margin-top: 1.5rem;
       padding-top: 1rem;
       border-top: 1px dashed var(--border-color);
       font-size: 0.875rem;
+      font-weight: 500;
       color: var(--text-muted);
       display: flex;
       align-items: center;
@@ -299,6 +311,7 @@
   <!-- Библиотека inline SVG-иконок -->
   <svg style="display: none;">
     <defs>
+      <!-- Иконка солнца -->
       <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="5"></circle>
         <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -310,21 +323,26 @@
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
       </symbol>
+      <!-- Иконка луны -->
       <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </symbol>
+      <!-- Иконка загрузки -->
       <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
         <polyline points="17 8 12 3 7 8"></polyline>
         <line x1="12" y1="3" x2="12" y2="15"></line>
       </symbol>
+      <!-- Иконка успешной галочки в круге -->
       <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
         <polyline points="22 4 12 14.01 9 11.01"></polyline>
       </symbol>
+      <!-- Иконка галочки -->
       <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"></polyline>
       </symbol>
+      <!-- Иконка перемешивания -->
       <symbol id="icon-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="16 3 21 3 21 8"></polyline>
         <line x1="4" y1="20" x2="21" y2="3"></line>
@@ -332,15 +350,26 @@
         <line x1="15" y1="15" x2="21" y2="21"></line>
         <line x1="4" y1="4" x2="9" y2="9"></line>
       </symbol>
+      <!-- Иконка назад -->
       <symbol id="icon-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
       </symbol>
+      <!-- Иконка вперед -->
       <symbol id="icon-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
       </symbol>
+      <!-- Иконка книги для темы -->
       <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </symbol>
+      <!-- Иконка полного экрана (расширить) -->
+      <symbol id="icon-maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+      </symbol>
+      <!-- Иконка полного экрана (сузить) -->
+      <symbol id="icon-minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
       </symbol>
     </defs>
   </svg>
@@ -359,6 +388,10 @@
       <div class="header-actions">
         <button class="btn btn-icon" id="btn-theme" title="Переключить тему">
           <svg class="icon"><use id="theme-icon-use" href="#icon-moon"></use></svg>
+        </button>
+        <!-- Синяя кнопка для перехода в полноэкранный режим -->
+        <button class="btn btn-icon btn-blue" id="btn-fullscreen" title="Полноэкранный режим">
+          <svg class="icon"><use id="fullscreen-icon-use" href="#icon-maximize"></use></svg>
         </button>
         <button class="btn" id="btn-upload">
           <svg class="icon icon-sm"><use href="#icon-upload"></use></svg>
@@ -541,6 +574,8 @@
       btnCheck: document.getElementById('btn-check'),
       themeIconUse: document.getElementById('theme-icon-use'),
       btnTheme: document.getElementById('btn-theme'),
+      btnFullscreen: document.getElementById('btn-fullscreen'),
+      fullscreenIconUse: document.getElementById('fullscreen-icon-use'),
       fileStatusText: document.getElementById('file-status-text'),
       fileInput: document.getElementById('file-input'),
       btnUpload: document.getElementById('btn-upload'),
@@ -553,9 +588,7 @@
 
     // Функция масштабирования текста под размер карточки
     function scaleTextToFit() {
-      // Используем requestAnimationFrame для надежного пересчета после обновления DOM
       requestAnimationFrame(() => {
-        // Сбрасываем инлайн-стили перед пересчетом
         els.cardQuestion.style.fontSize = '';
         els.cardAnswer.style.fontSize = '';
 
@@ -564,22 +597,19 @@
 
         const fitText = (container, textElement) => {
           let fontSize = parseFloat(window.getComputedStyle(textElement).fontSize);
-          const minFontSize = 14; // Минимально читаемый размер шрифта
+          const minFontSize = 14; 
 
-          // Пока контент не помещается по высоте и шрифт больше минимального – плавно уменьшаем
           while (container.scrollHeight > container.clientHeight && fontSize > minFontSize) {
             fontSize -= 0.5;
             textElement.style.fontSize = fontSize + 'px';
           }
         };
 
-        // Вызываем масштабирование для обеих сторон
         fitText(frontFace, els.cardQuestion);
         fitText(backFace, els.cardAnswer);
       });
     }
 
-    // Пересчет при повороте или изменении размера экрана
     window.addEventListener('resize', scaleTextToFit);
 
     // Фильтрация
@@ -593,7 +623,6 @@
 
     // Обновление интерфейса
     function updateUI() {
-      // Обновляем счетчики на вкладках
       els.tabAll.textContent = `Все термины (${cards.length})`;
       els.tabLearning.textContent = `Осталось выучить (${cards.length - learnedIds.size})`;
       els.tabLearned.textContent = `Выученные (${learnedIds.size})`;
@@ -607,7 +636,6 @@
         els.mainContent.style.display = 'flex';
         els.emptyState.style.display = 'none';
 
-        // Корректировка индекса, если он вышел за пределы
         if (currentIndex >= filtered.length) currentIndex = 0;
 
         const currentCard = filtered[currentIndex];
@@ -615,15 +643,18 @@
         els.cardAnswer.textContent = currentCard.answer;
         els.statusText.textContent = `Карточка ${currentIndex + 1} из ${filtered.length}`;
 
-        // Добавляем подсказку с темой, если она есть
+        // Логика лаконичной подсказки
         if (currentCard.topic) {
-          els.cardTopicHint.innerHTML = `<svg class="icon icon-sm"><use href="#icon-book"></use></svg> <span>подсказка: если ошиблись, повторите раздел «${currentCard.topic}»</span>`;
+          // Ищем совпадение вида "Тема 1."
+          const match = currentCard.topic.match(/^(Тема\s*\d+\.?)/i);
+          const shortTopic = match ? match[1] : currentCard.topic;
+          
+          els.cardTopicHint.innerHTML = `<svg class="icon icon-sm"><use href="#icon-book"></use></svg> <span>${shortTopic}</span>`;
           els.cardTopicHint.style.display = 'flex';
         } else {
           els.cardTopicHint.style.display = 'none';
         }
 
-        // Статус "Выучено"
         if (learnedIds.has(currentCard.id)) {
           els.btnCheck.classList.add('active');
           els.btnCheck.title = 'Убрать из выученных';
@@ -632,7 +663,6 @@
           els.btnCheck.title = 'Отметить как выученное';
         }
 
-        // Запускаем автоматическое масштабирование текста
         scaleTextToFit();
       }
     }
@@ -689,7 +719,6 @@
       isFlipped = false;
       els.cardWrapper.classList.remove('flipped');
       setTimeout(() => {
-        // Перемешиваем массив карточек
         cards.sort(() => Math.random() - 0.5);
         currentIndex = 0;
         updateUI();
@@ -721,6 +750,37 @@
       }
     });
 
+    // Полноэкранный режим
+    function toggleFullscreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    els.btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    function updateFullscreenIcon() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        els.fullscreenIconUse.setAttribute('href', '#icon-minimize');
+      } else {
+        els.fullscreenIconUse.setAttribute('href', '#icon-maximize');
+      }
+    }
+    
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
     // Загрузка файла
     els.btnUpload.addEventListener('click', () => els.fileInput.click());
     
@@ -747,7 +807,6 @@
       reader.readAsText(file);
     });
 
-    // Парсер CSV с поддержкой трех колонок: Вопрос, Ответ, Тема (опционально)
     function parseCSV(text) {
       const result = [];
       let row = [];
@@ -778,7 +837,7 @@
                 id: Date.now() + Math.random().toString(), 
                 question: row[0], 
                 answer: row[1],
-                topic: row[2] ? row[2] : '' // Добавлена поддержка третьей колонки (Тема)
+                topic: row[2] ? row[2] : '' 
               });
             }
             row = [];
@@ -803,7 +862,6 @@
       return result;
     }
 
-    // Инициализация при старте
     updateUI();
   </script>
 </body>
