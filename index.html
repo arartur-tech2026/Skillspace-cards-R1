@@ -1,96 +1,273 @@
-import React, { useState, useRef, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Человек и общество – Карточки</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --card-front-bg: #ffffff;
+      --card-back-bg: #eff6ff;
+      --border-color: #e2e8f0;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #10b981;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+    }
 
-// Полная база из 82 карточек по разделу 1 "Человек и общество"
-const defaultCards = [
-  { id: '1', question: 'Что такое общество в широком смысле слова?', answer: 'Это обособившаяся от природы, но тесно с ней связанная часть материального мира, включающая способы взаимодействия и формы объединения людей.' },
-  { id: '2', question: 'Из каких двух основных частей состоит окружающий нас материальный мир?', answer: 'Материальный мир состоит из природы и общества.' },
-  { id: '3', question: 'Как называется признак общества, выражающийся в его постоянном изменении и развитии под влиянием различных факторов?', answer: 'Динамичность.' },
-  { id: '4', question: 'В чем проявляется такая характеристика общества, как «открытость»?', answer: 'В способности общества обмениваться информацией, ресурсами и культурными достижениями с внешней средой.' },
-  { id: '5', question: 'Как называется признак общества, означающий, что оно состоит из взаимосвязанных элементов (институтов, групп), образующих единую структуру?', answer: 'Системность.' },
-  { id: '6', question: 'Назовите основной способ ведения хозяйства в первобытном обществе.', answer: 'Охота, собирательство и натуральное хозяйство.' },
-  { id: '7', question: 'Каков основной регулятор общественных отношений в традиционном обществе?', answer: 'Традиции и обычаи, передающиеся из поколения в поколение.' },
-  { id: '8', question: 'Для какого типа общества характерна низкая социальная мобильность и преобладание аграрного уклада?', answer: 'Традиционное общество.' },
-  { id: '9', question: 'Что является экономической основой индустриального общества?', answer: 'Промышленный способ производства и массовое применение машинного труда.' },
-  { id: '10', question: 'Какой ресурс становится главным в постиндустриальном (информационном) обществе?', answer: 'Знания, информация и высокие технологии.' },
-  { id: '11', question: 'В каком типе общества сфера услуг начинает играть ведущую роль, преобладая над производством товаров?', answer: 'В постиндустриальном (информационном) обществе.' },
-  { id: '12', question: 'Что такое природа в узком смысле?', answer: 'Весь материальный мир за исключением общества, естественная среда обитания человека.' },
-  { id: '13', question: 'Что такое социальный институт?', answer: 'Исторически сложившаяся устойчивая форма организации совместной деятельности людей, направленной на удовлетворение базовых потребностей.' },
-  { id: '14', question: 'Приведите примеры социальных институтов.', answer: 'Семья, государство, религия, образование, производство.' },
-  { id: '15', question: 'Каковы основные функции социальных институтов?', answer: 'Удовлетворение потребностей, регуляция поведения, социализация, интеграция.' },
-  { id: '16', question: 'Что такое общественный прогресс?', answer: 'Направление развития, для которого характерен переход от низшего к высшему, от простого к более сложному.' },
-  { id: '17', question: 'Что такое общественный регресс?', answer: 'Направление развития от высшего к низшему, деградация, возврат к изжившим себя формам.' },
-  { id: '18', question: 'Что такое эволюция?', answer: 'Постепенные, плавные изменения в обществе, не приводящие к быстрому качественному скачку.' },
-  { id: '19', question: 'Что такое революция?', answer: 'Коренные, скачкообразные изменения всех или большинства сторон общественной жизни.' },
-  { id: '20', question: 'Что такое реформа?', answer: 'Целенаправленное преобразование какой-либо стороны общественной жизни, проводимое государственной властью.' },
-  { id: '21', question: 'В чем заключается противоречивость общественного прогресса?', answer: 'Развитие в одной сфере может сопровождаться деградацией в другой (например, рост технологий и ухудшение экологии).' },
-  { id: '22', question: 'Что такое глобализация?', answer: 'Процесс всемирной экономической, политической и культурной интеграции и унификации.' },
-  { id: '23', question: 'Назовите позитивные последствия глобализации.', answer: 'Доступ к информации, объединение усилий для решения проблем, развитие международной торговли.' },
-  { id: '24', question: 'Назовите негативные последствия глобализации.', answer: 'Утрата культурной специфики, зависимость экономик, рост разрыва между богатыми и бедными странами.' },
-  { id: '25', question: 'Что такое глобальные проблемы?', answer: 'Совокупность проблем человечества, от решения которых зависит существование цивилизации.' },
-  { id: '26', question: 'Назовите основные виды глобальных проблем.', answer: 'Экологические, демографические, угроза ядерной войны, международный терроризм, проблема «Север-Юг».' },
-  { id: '27', question: 'В чем проявляется проблема «Север-Юг»?', answer: 'В сильном экономическом разрыве между развитыми странами Севера и развивающимися странами Юга.' },
-  { id: '28', question: 'Кто такой индивид?', answer: 'Единичный представитель человеческого рода, носитель биологических качеств.' },
-  { id: '29', question: 'Что такое индивидуальность?', answer: 'Неповторимое своеобразие проявлений человека, подчеркивающее его исключительность.' },
-  { id: '30', question: 'Кто такой личность?', answer: 'Индивид, обладающий совокупностью социально значимых качеств, которые он реализует в общественной жизни.' },
-  { id: '31', question: 'Что такое социализация?', answer: 'Процесс усвоения индивидом социальных норм, культурных ценностей и образцов поведения общества.' },
-  { id: '32', question: 'Кто такие агенты социализации?', answer: 'Люди, социальные группы, учреждения и организации, ответственные за воспитание и обучение.' },
-  { id: '33', question: 'Приведите примеры агентов первичной социализации.', answer: 'Семья, близкие друзья, школьные учителя.' },
-  { id: '34', question: 'Приведите примеры агентов вторичной социализации.', answer: 'Администрация школы или университета, руководство на работе, государство, СМИ.' },
-  { id: '35', question: 'Что такое потребность?', answer: 'Переживаемая и осознаваемая человеком нужда в том, что необходимо для поддержания его организма и развития личности.' },
-  { id: '36', question: 'Какие выделяют три основные группы потребностей?', answer: 'Биологические (материальные), социальные, духовные (идеальные).' },
-  { id: '37', question: 'Приведите примеры биологических потребностей.', answer: 'Пища, вода, сон, дыхание, тепло, самосохранение.' },
-  { id: '38', question: 'Приведите примеры социальных потребностей.', answer: 'Общение, труд, общественное признание, принадлежность к определенной группе.' },
-  { id: '39', question: 'Приведите примеры духовных потребностей.', answer: 'Познание, творчество, поиск смысла жизни, самореализация.' },
-  { id: '40', question: 'Что такое мнимые (ложные) потребности?', answer: 'Потребности, удовлетворение которых ведет к физической и духовной деградации личности (алкоголь, наркотики).' },
-  { id: '41', question: 'Что такое деятельность?', answer: 'Специфический вид человеческой активности, направленный на преобразование окружающего мира и самого себя.' },
-  { id: '42', question: 'Назовите основные структурные элементы деятельности.', answer: 'Субъект, объект, мотив, цель, средства, процесс, результат.' },
-  { id: '43', question: 'Кто такой субъект деятельности?', answer: 'Тот, кто осуществляет деятельность (человек, социальная группа, общество в целом).' },
-  { id: '44', question: 'Что такое объект деятельности?', answer: 'То, на что направлена деятельность (предметы, процессы, другие люди).' },
-  { id: '45', question: 'Что такое мотив деятельности?', answer: 'То, что побуждает человека к деятельности (потребности, интересы, убеждения, идеалы).' },
-  { id: '46', question: 'Что такое цель деятельности?', answer: 'Осознанный образ желаемого (предвосхищаемого) результата.' },
-  { id: '47', question: 'Назовите основные виды деятельности.', answer: 'Игра, учение (познание), труд, общение.' },
-  { id: '48', question: 'В чем особенность игры как вида деятельности?', answer: 'Ориентация не на результат, а на сам процесс, наличие условной воображаемой ситуации и строгих правил.' },
-  { id: '49', question: 'Какова главная цель учения как вида деятельности?', answer: 'Приобретение человеком новых знаний, умений и навыков.' },
-  { id: '50', question: 'Что отличает труд от других видов деятельности?', answer: 'Направленность на достижение практически полезного результата, создание материальных и духовных благ.' },
-  { id: '51', question: 'Что такое общение?', answer: 'Вид деятельности, при котором происходит обмен информацией, идеями, эмоциями и оценками между людьми.' },
-  { id: '52', question: 'Что такое познание?', answer: 'Процесс постижения действительности, накопления и осмысления данных, полученных в опыте взаимодействия человека с окружающим миром.' },
-  { id: '53', question: 'Назовите два уровня (этапа) познания.', answer: 'Чувственное и рациональное познание.' },
-  { id: '54', question: 'Каковы формы чувственного познания?', answer: 'Ощущение, восприятие, представление.' },
-  { id: '55', question: 'Что такое ощущение?', answer: 'Отражение отдельных свойств предмета, воздействующего в данный момент на органы чувств.' },
-  { id: '56', question: 'Что такое восприятие?', answer: 'Целостный чувственный образ предмета, воздействующего в данный момент на органы чувств.' },
-  { id: '57', question: 'Что такое представление?', answer: 'Чувственно-наглядный образ предмета, сохраняемый в памяти без его непосредственного воздействия на органы чувств.' },
-  { id: '58', question: 'Каковы формы рационального познания?', answer: 'Понятие, суждение, умозаключение.' },
-  { id: '59', question: 'Что такое понятие?', answer: 'Мысль, фиксирующая общие и существенные признаки вещей и явлений.' },
-  { id: '60', question: 'Что такое суждение?', answer: 'Мысль, утверждающая или отрицающая что-либо об объекте познания.' },
-  { id: '61', question: 'Что такое умозаключение?', answer: 'Мысленная связь нескольких суждений и выведение из них логическим путем нового суждения (вывода).' },
-  { id: '62', question: 'Что такое истина?', answer: 'Знание, соответствующее свойствам познаваемого предмета, адекватное объективное отражение действительности.' },
-  { id: '63', question: 'В чем разница между абсолютной и относительной истиной?', answer: 'Абсолютная – исчерпывающее, неизменное знание. Относительная – точное при определенных условиях, но ограниченное знание, которое может дополняться в будущем.' },
-  { id: '64', question: 'Назовите основной критерий истины.', answer: 'Общественная практика (опыт, эксперимент).' },
-  { id: '65', question: 'Что такое культура в широком смысле?', answer: 'Всё, что создано человечеством в период его жизнедеятельности, все виды преобразовательной деятельности и её результаты.' },
-  { id: '66', question: 'На какие две формы делится культура по своему характеру?', answer: 'Материальная и духовная культура.' },
-  { id: '67', question: 'Что относится к материальной культуре?', answer: 'Техника, здания, одежда, орудия труда (все осязаемые результаты деятельности).' },
-  { id: '68', question: 'Что относится к духовной культуре?', answer: 'Идеи, знания, верования, ценности, правила (все неосязаемые результаты деятельности).' },
-  { id: '69', question: 'Назовите три типа культуры по уровню аудитории.', answer: 'Элитарная, массовая, народная культура.' },
-  { id: '70', question: 'Для какой культуры характерны анонимность творцов и устная передача из поколения в поколение?', answer: 'Для народной культуры.' },
-  { id: '71', question: 'Какая культура ориентирована на коммерческий успех и стандартизацию?', answer: 'Массовая культура (поп-культура).' },
-  { id: '72', question: 'Что такое мораль?', answer: 'Специфический способ регулирования общественной жизни с позиций гуманизма, добра и справедливости.' },
-  { id: '73', question: 'Как звучит «золотое правило нравственности»?', answer: '«Относись к другим людям так, как хочешь, чтобы они относились к тебе».' },
-  { id: '74', question: 'Назовите три отличия морали от права.', answer: 'неписаный характер, создается обществом (а не государством), не имеет строгой юридической ответственности за нарушение.' },
-  { id: '75', question: 'В чем заключается оценочная функция морали?', answer: 'В способности давать характеристику поступкам людей с точки зрения добра и зла.' },
-  { id: '76', question: 'Что такое «социальные санкции»?', answer: 'Меры одобрения или порицания (позитивные и негативные), применяемые обществом для регуляции поведения индивида.' },
-  { id: '77', question: 'Дайте определение религии.', answer: 'Это форма духовной культуры и мировоззрение, основанное на вере в существование сверхъестественных сил.' },
-  { id: '78', question: 'Назовите три мировые религии.', answer: 'буддизм, христианство и ислам.' },
-  { id: '79', question: 'Чем монотеистические религии отличаются от политеистических?', answer: 'Монотеизм – это вера в одного Бога, политеизм – вера во многих богов.' },
-  { id: '80', question: 'Является ли буддизм монотеистической религией?', answer: 'Нет, буддизм не признает Бога-творца; Будда является духовным учителем, а не Богом.' },
-  { id: '81', question: 'В чем заключается компенсаторная функция религии?', answer: 'В оказании психологической помощи, дарении надежды и утешения в трудные моменты жизни.' },
-  { id: '82', question: 'Что такое «конфессия»?', answer: 'Это отдельное направление или школа внутри одной конкретной религии (например, православие, католицизм и протестантизм в христианстве).' }
-];
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --card-front-bg: #1e293b;
+      --card-back-bg: #172554;
+      --border-color: #334155;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --success: #34d399;
+      --shadow-color: rgba(0, 0, 0, 0.4);
+    }
 
-// Библиотека inline SVG-иконок
-const SvgLibrary = () => (
-  <svg style={{ display: 'none' }}>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; }
+
+    .app-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-front-bg) 100%);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .header-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0; }
+    .header-subtitle { font-size: 0.875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Typography & Icons */
+    .icon { width: 1.25rem; height: 1.25rem; }
+    .icon-sm { width: 1rem; height: 1rem; }
+    .icon-lg { width: 1.75rem; height: 1.75rem; }
+    .text-success { color: var(--success); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      background: var(--card-front-bg);
+      color: var(--text-main);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn:hover { border-color: var(--accent); }
+    .btn-icon { padding: 0.5rem; border-radius: 0.5rem; }
+
+    /* Horizontal Scroll Tabs */
+    .tabs-wrapper {
+      width: 100%;
+      max-width: 800px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-bottom: 2rem;
+    }
+    .tabs-wrapper::-webkit-scrollbar { display: none; }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .tab {
+      white-space: nowrap;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      background: var(--card-front-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Status text */
+    .status-text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Card */
+    .card-wrapper {
+      width: 100%;
+      max-width: 600px;
+      height: 320px;
+      perspective: 1000px;
+      cursor: pointer;
+      margin-bottom: 2.5rem;
+    }
+    @media (min-width: 768px) { .card-wrapper { height: 384px; } }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      box-shadow: 0 10px 25px var(--shadow-color);
+      border-radius: 1rem;
+    }
+    .card-wrapper.flipped .card-inner { transform: rotateX(180deg); }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border-radius: 1rem;
+      border-top: 4px solid;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .card-front {
+      background: var(--card-front-bg);
+      border-top-color: var(--accent);
+    }
+    .card-back {
+      background: var(--card-back-bg);
+      border-top-color: var(--success);
+      transform: rotateX(180deg);
+      overflow-y: auto;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card-front .card-label { color: var(--accent); }
+    .card-back .card-label { color: var(--success); }
+
+    .card-content { font-size: 1.25rem; font-weight: 600; line-height: 1.5; }
+    @media (min-width: 768px) { .card-content { font-size: 1.5rem; } }
+    .card-back .card-content { font-weight: 500; color: var(--text-main); }
+
+    .card-hint {
+      position: absolute;
+      bottom: 1.25rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    @media (min-width: 768px) { .controls { gap: 1.5rem; } }
+
+    .btn-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--card-front-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-control:hover { transform: scale(1.05); border-color: var(--accent); }
+
+    .btn-nav { width: 3rem; height: 3rem; }
+    .btn-action { width: 3rem; height: 3rem; color: var(--text-muted); }
+    .btn-action.active { background: var(--success); color: #fff; border-color: var(--success); }
+
+    .btn-main {
+      width: 3.5rem; height: 3.5rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 10px var(--shadow-color);
+    }
+    .btn-main:hover { background: var(--accent-hover); }
+    @media (min-width: 768px) {
+      .btn-nav, .btn-action { width: 3.5rem; height: 3.5rem; }
+      .btn-main { width: 4rem; height: 4rem; }
+    }
+
+    .empty-state {
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.125rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Библиотека inline SVG-иконок -->
+  <svg style="display: none;">
     <defs>
-      <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="5"></circle>
         <line x1="12" y1="1" x2="12" y2="3"></line>
         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -101,549 +278,428 @@ const SvgLibrary = () => (
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
       </symbol>
-      <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </symbol>
-      <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
         <polyline points="17 8 12 3 7 8"></polyline>
         <line x1="12" y1="3" x2="12" y2="15"></line>
       </symbol>
-      <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
         <polyline points="22 4 12 14.01 9 11.01"></polyline>
       </symbol>
-      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"></polyline>
       </symbol>
-      <symbol id="icon-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="16 3 21 3 21 8"></polyline>
         <line x1="4" y1="20" x2="21" y2="3"></line>
         <polyline points="21 16 21 21 16 21"></polyline>
         <line x1="15" y1="15" x2="21" y2="21"></line>
         <line x1="4" y1="4" x2="9" y2="9"></line>
       </symbol>
-      <symbol id="icon-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
       </symbol>
-      <symbol id="icon-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <symbol id="icon-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
-      </symbol>
-      <symbol id="icon-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-        <polyline points="3 3 3 8 8 8"></polyline>
       </symbol>
     </defs>
   </svg>
-);
 
-// Встроенные стили (без сторонних библиотек)
-const styles = `
-:root {
-  --bg-color: #f8fafc;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --card-front-bg: #ffffff;
-  --card-back-bg: #eff6ff;
-  --border-color: #e2e8f0;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --success: #10b981;
-  --shadow-color: rgba(0, 0, 0, 0.08);
-}
-
-[data-theme="dark"] {
-  --bg-color: #0f172a;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --card-front-bg: #1e293b;
-  --card-back-bg: #172554;
-  --border-color: #334155;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --success: #34d399;
-  --shadow-color: rgba(0, 0, 0, 0.4);
-}
-
-* { box-sizing: border-box; }
-body { margin: 0; padding: 0; }
-
-.app-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-front-bg) 100%);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, sans-serif;
-  transition: background 0.3s ease, color 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 1rem;
-}
-
-/* Header */
-.header {
-  width: 100%;
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-@media (min-width: 768px) {
-  .header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
-
-.header-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0; }
-.header-subtitle { font-size: 0.875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; margin: 0; }
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* Typography & Icons */
-.icon { width: 1.25rem; height: 1.25rem; }
-.icon-sm { width: 1rem; height: 1rem; }
-.icon-lg { width: 1.75rem; height: 1.75rem; }
-.text-success { color: var(--success); }
-
-/* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
-  background: var(--card-front-bg);
-  color: var(--text-main);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.btn:hover { border-color: var(--accent); }
-.btn-icon { padding: 0.5rem; border-radius: 0.5rem; }
-
-/* Horizontal Scroll Tabs */
-.tabs-wrapper {
-  width: 100%;
-  max-width: 800px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  margin-bottom: 2rem;
-}
-.tabs-wrapper::-webkit-scrollbar { display: none; }
-
-.tabs {
-  display: flex;
-  gap: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-.tab {
-  white-space: nowrap;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  background: var(--card-front-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-}
-.tab.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-
-/* Status text */
-.status-text {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.05em;
-}
-
-/* Card */
-.card-wrapper {
-  width: 100%;
-  max-width: 600px;
-  height: 320px;
-  perspective: 1000px;
-  cursor: pointer;
-  margin-bottom: 2.5rem;
-}
-@media (min-width: 768px) { .card-wrapper { height: 384px; } }
-
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-  box-shadow: 0 10px 25px var(--shadow-color);
-  border-radius: 1rem;
-}
-.card-wrapper.flipped .card-inner { transform: rotateX(180deg); }
-
-.card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  border-radius: 1rem;
-  border-top: 4px solid;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-.card-front {
-  background: var(--card-front-bg);
-  border-top-color: var(--accent);
-}
-.card-back {
-  background: var(--card-back-bg);
-  border-top-color: var(--success);
-  transform: rotateX(180deg);
-  overflow-y: auto;
-}
-
-.card-label {
-  position: absolute;
-  top: 1.25rem;
-  left: 1.25rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.card-front .card-label { color: var(--accent); }
-.card-back .card-label { color: var(--success); }
-
-.card-content { font-size: 1.25rem; font-weight: 600; line-height: 1.5; }
-@media (min-width: 768px) { .card-content { font-size: 1.5rem; } }
-.card-back .card-content { font-weight: 500; color: var(--text-main); }
-
-.card-hint {
-  position: absolute;
-  bottom: 1.25rem;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Controls */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-@media (min-width: 768px) { .controls { gap: 1.5rem; } }
-
-.btn-control {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background: var(--card-front-bg);
-  color: var(--text-main);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.btn-control:hover { transform: scale(1.05); border-color: var(--accent); }
-
-.btn-nav { width: 3rem; height: 3rem; }
-.btn-action { width: 3rem; height: 3rem; color: var(--text-muted); }
-.btn-action.active { background: var(--success); color: #fff; border-color: var(--success); }
-
-.btn-main {
-  width: 3.5rem; height: 3.5rem;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  box-shadow: 0 4px 10px var(--shadow-color);
-}
-.btn-main:hover { background: var(--accent-hover); }
-@media (min-width: 768px) {
-  .btn-nav, .btn-action { width: 3.5rem; height: 3.5rem; }
-  .btn-main { width: 4rem; height: 4rem; }
-}
-
-.empty-state {
-  padding: 3rem;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 1.125rem;
-}
-`;
-
-export default function FlashcardsApp() {
-  const [cards, setCards] = useState(defaultCards);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [fileName, setFileName] = useState('');
-  const [theme, setTheme] = useState('light');
-  
-  // Добавленные состояния для навигации
-  const [activeTab, setActiveTab] = useState('all');
-  const [learnedIds, setLearnedIds] = useState(new Set());
-  
-  const fileInputRef = useRef(null);
-
-  // Применение темы
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  }, [theme]);
-
-  // Фильтрация карточек по вкладкам
-  const filteredCards = cards.filter(card => {
-    if (activeTab === 'learned') return learnedIds.has(card.id);
-    if (activeTab === 'learning') return !learnedIds.has(card.id);
-    return true; // для 'all'
-  });
-
-  // Сброс индекса при смене вкладки или загрузке файла
-  useEffect(() => {
-    setCurrentIndex(0);
-    setIsFlipped(false);
-  }, [activeTab, cards]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-
-  const parseCSV = (text) => {
-    const result = [];
-    let row = [];
-    let inQuotes = false;
-    let currentVal = '';
-    
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      if (inQuotes) {
-        if (char === '"' && text[i + 1] === '"') {
-          currentVal += '"';
-          i++;
-        } else if (char === '"') {
-          inQuotes = false;
-        } else {
-          currentVal += char;
-        }
-      } else {
-        if (char === '"') {
-          inQuotes = true;
-        } else if (char === ',') {
-          row.push(currentVal.trim());
-          currentVal = '';
-        } else if (char === '\n' || char === '\r') {
-          row.push(currentVal.trim());
-          if (row.length >= 2 && row[0] && row[1]) {
-            result.push({ id: Date.now() + Math.random().toString(), question: row[0], answer: row[1] });
-          }
-          row = [];
-          currentVal = '';
-          if (char === '\r' && text[i + 1] === '\n') i++;
-        } else {
-          currentVal += char;
-        }
-      }
-    }
-    if (currentVal || row.length > 0) {
-      row.push(currentVal.trim());
-      if (row.length >= 2 && row[0] && row[1]) {
-        result.push({ id: Date.now() + Math.random().toString(), question: row[0], answer: row[1] });
-      }
-    }
-    return result;
-  };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target.result;
-      const parsedCards = parseCSV(text);
-      if (parsedCards.length > 0) {
-        setCards(parsedCards);
-        setLearnedIds(new Set());
-      } else {
-        alert('Не удалось распознать карточки.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  const nextCard = () => {
-    if (filteredCards.length <= 1) return;
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % filteredCards.length);
-    }, 150);
-  };
-
-  const prevCard = () => {
-    if (filteredCards.length <= 1) return;
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + filteredCards.length) % filteredCards.length);
-    }, 150);
-  };
-
-  const shuffleCards = () => {
-    if (filteredCards.length <= 1) return;
-    setIsFlipped(false);
-    setTimeout(() => {
-      const shuffled = [...cards].sort(() => Math.random() - 0.5);
-      setCards(shuffled);
-    }, 150);
-  };
-
-  const toggleLearnedStatus = () => {
-    if (filteredCards.length === 0) return;
-    const currentCard = filteredCards[currentIndex];
-    setLearnedIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(currentCard.id)) {
-        newSet.delete(currentCard.id);
-      } else {
-        newSet.add(currentCard.id);
-      }
-      return newSet;
-    });
-  };
-
-  const currentCard = filteredCards.length > 0 ? filteredCards[currentIndex] : null;
-
-  return (
-    <>
-      <SvgLibrary />
-      <style>{styles}</style>
-      
-      <div className="app-container">
-        {/* Шапка */}
-        <div className="header">
-          <div>
-            <h1 className="header-title">Человек и общество</h1>
-            <p className="header-subtitle">
-              {fileName ? (
-                <>
-                  <svg className="icon icon-sm text-success"><use href="#icon-check-circle" /></svg>
-                  Загружен файл: {fileName}
-                </>
-              ) : (
-                <>
-                  <svg className="icon icon-sm text-success"><use href="#icon-check-circle" /></svg>
-                  Встроена полная база: Раздел 1 (82 термина)
-                </>
-              )}
-            </p>
-          </div>
-          
-          <div className="header-actions">
-            <button className="btn btn-icon" onClick={toggleTheme} title="Переключить тему">
-              <svg className="icon"><use href={theme === 'light' ? '#icon-moon' : '#icon-sun'} /></svg>
-            </button>
-            <button className="btn" onClick={() => fileInputRef.current?.click()}>
-              <svg className="icon icon-sm"><use href="#icon-upload" /></svg>
-              Загрузить
-            </button>
-            <input type="file" accept=".csv" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
-          </div>
-        </div>
-
-        {/* Навигация (вкладки) */}
-        <div className="tabs-wrapper">
-          <div className="tabs">
-            <button className={`tab ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>
-              Все термины ({cards.length})
-            </button>
-            <button className={`tab ${activeTab === 'learning' ? 'active' : ''}`} onClick={() => setActiveTab('learning')}>
-              Осталось выучить ({cards.length - learnedIds.size})
-            </button>
-            <button className={`tab ${activeTab === 'learned' ? 'active' : ''}`} onClick={() => setActiveTab('learned')}>
-              Выученные ({learnedIds.size})
-            </button>
-          </div>
-        </div>
-
-        {filteredCards.length > 0 ? (
-          <>
-            <div className="status-text">
-              Карточка {currentIndex + 1} из {filteredCards.length}
-            </div>
-
-            {/* Карточка */}
-            <div className={`card-wrapper ${isFlipped ? 'flipped' : ''}`} onClick={() => setIsFlipped(!isFlipped)}>
-              <div className="card-inner">
-                {/* Лицевая сторона */}
-                <div className="card-face card-front">
-                  <span className="card-label">Вопрос</span>
-                  <h2 className="card-content">{currentCard.question}</h2>
-                  <p className="card-hint">Нажмите, чтобы перевернуть</p>
-                </div>
-
-                {/* Обратная сторона */}
-                <div className="card-face card-back">
-                  <span className="card-label">Ответ</span>
-                  <p className="card-content">{currentCard.answer}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Элементы управления */}
-            <div className="controls">
-              <button className="btn-control btn-action" onClick={shuffleCards} title="Перемешать все">
-                <svg className="icon"><use href="#icon-shuffle" /></svg>
-              </button>
-              
-              <button className="btn-control btn-nav" onClick={prevCard} title="Предыдущая">
-                <svg className="icon"><use href="#icon-prev" /></svg>
-              </button>
-              
-              <button className="btn-control btn-main" onClick={nextCard} title="Следующая">
-                <svg className="icon icon-lg"><use href="#icon-next" /></svg>
-              </button>
-
-              <button 
-                className={`btn-control btn-action ${learnedIds.has(currentCard.id) ? 'active' : ''}`} 
-                onClick={toggleLearnedStatus} 
-                title={learnedIds.has(currentCard.id) ? "Убрать из выученных" : "Отметить как выученное"}
-              >
-                <svg className="icon"><use href="#icon-check" /></svg>
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="empty-state">
-            В этой категории пока нет карточек.
-          </div>
-        )}
+  <div class="app-container">
+    <!-- Шапка -->
+    <div class="header">
+      <div>
+        <h1 class="header-title">Человек и общество</h1>
+        <p class="header-subtitle" id="header-subtitle">
+          <svg class="icon icon-sm text-success"><use href="#icon-check-circle"></use></svg>
+          <span id="file-status-text">Встроена полная база: Раздел 1 (82 термина)</span>
+        </p>
       </div>
-    </>
-  );
-}
+      
+      <div class="header-actions">
+        <button class="btn btn-icon" id="btn-theme" title="Переключить тему">
+          <svg class="icon"><use id="theme-icon-use" href="#icon-moon"></use></svg>
+        </button>
+        <button class="btn" id="btn-upload">
+          <svg class="icon icon-sm"><use href="#icon-upload"></use></svg>
+          Загрузить
+        </button>
+        <input type="file" accept=".csv" id="file-input" style="display: none;" />
+      </div>
+    </div>
+
+    <!-- Навигация (вкладки) -->
+    <div class="tabs-wrapper">
+      <div class="tabs" id="tabs-container">
+        <button class="tab active" data-tab="all" id="tab-all">Все термины (0)</button>
+        <button class="tab" data-tab="learning" id="tab-learning">Осталось выучить (0)</button>
+        <button class="tab" data-tab="learned" id="tab-learned">Выученные (0)</button>
+      </div>
+    </div>
+
+    <!-- Карточка и элементы управления -->
+    <div id="main-content" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+      <div class="status-text" id="status-text">Карточка 1 из 0</div>
+
+      <div class="card-wrapper" id="card-wrapper">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <span class="card-label">Вопрос</span>
+            <h2 class="card-content" id="card-question"></h2>
+            <p class="card-hint">Нажмите, чтобы перевернуть</p>
+          </div>
+          <div class="card-face card-back">
+            <span class="card-label">Ответ</span>
+            <p class="card-content" id="card-answer"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls" id="controls">
+        <button class="btn-control btn-action" id="btn-shuffle" title="Перемешать все">
+          <svg class="icon"><use href="#icon-shuffle"></use></svg>
+        </button>
+        <button class="btn-control btn-nav" id="btn-prev" title="Предыдущая">
+          <svg class="icon"><use href="#icon-prev"></use></svg>
+        </button>
+        <button class="btn-control btn-main" id="btn-next" title="Следующая">
+          <svg class="icon icon-lg"><use href="#icon-next"></use></svg>
+        </button>
+        <button class="btn-control btn-action" id="btn-check" title="Отметить как выученное">
+          <svg class="icon"><use href="#icon-check"></use></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Пустое состояние -->
+    <div class="empty-state" id="empty-state">
+      В этой категории пока нет карточек.
+    </div>
+  </div>
+
+  <script>
+    // Полная база из 82 карточек (все длинные тире заменены на средние по правилам)
+    const defaultCards = [
+      { id: '1', question: 'Что такое общество в широком смысле слова?', answer: 'Это обособившаяся от природы, но тесно с ней связанная часть материального мира, включающая способы взаимодействия и формы объединения людей.' },
+      { id: '2', question: 'Из каких двух основных частей состоит окружающий нас материальный мир?', answer: 'Материальный мир состоит из природы и общества.' },
+      { id: '3', question: 'Как называется признак общества, выражающийся в его постоянном изменении и развитии под влиянием различных факторов?', answer: 'Динамичность.' },
+      { id: '4', question: 'В чем проявляется такая характеристика общества, как «открытость»?', answer: 'В способности общества обмениваться информацией, ресурсами и культурными достижениями с внешней средой.' },
+      { id: '5', question: 'Как называется признак общества, означающий, что оно состоит из взаимосвязанных элементов (институтов, групп), образующих единую структуру?', answer: 'Системность.' },
+      { id: '6', question: 'Назовите основной способ ведения хозяйства в первобытном обществе.', answer: 'Охота, собирательство и натуральное хозяйство.' },
+      { id: '7', question: 'Каков основной регулятор общественных отношений в традиционном обществе?', answer: 'Традиции и обычаи, передающиеся из поколения в поколение.' },
+      { id: '8', question: 'Для какого типа общества характерна низкая социальная мобильность и преобладание аграрного уклада?', answer: 'Традиционное общество.' },
+      { id: '9', question: 'Что является экономической основой индустриального общества?', answer: 'Промышленный способ производства и массовое применение машинного труда.' },
+      { id: '10', question: 'Какой ресурс становится главным в постиндустриальном (информационном) обществе?', answer: 'Знания, информация и высокие технологии.' },
+      { id: '11', question: 'В каком типе общества сфера услуг начинает играть ведущую роль, преобладая над производством товаров?', answer: 'В постиндустриальном (информационном) обществе.' },
+      { id: '12', question: 'Что такое природа в узком смысле?', answer: 'Весь материальный мир за исключением общества, естественная среда обитания человека.' },
+      { id: '13', question: 'Что такое социальный институт?', answer: 'Исторически сложившаяся устойчивая форма организации совместной деятельности людей, направленной на удовлетворение базовых потребностей.' },
+      { id: '14', question: 'Приведите примеры социальных институтов.', answer: 'Семья, государство, религия, образование, производство.' },
+      { id: '15', question: 'Каковы основные функции социальных институтов?', answer: 'Удовлетворение потребностей, регуляция поведения, социализация, интеграция.' },
+      { id: '16', question: 'Что такое общественный прогресс?', answer: 'Направление развития, для которого характерен переход от низшего к высшему, от простого к более сложному.' },
+      { id: '17', question: 'Что такое общественный регресс?', answer: 'Направление развития от высшего к низшему, деградация, возврат к изжившим себя формам.' },
+      { id: '18', question: 'Что такое эволюция?', answer: 'Постепенные, плавные изменения в обществе, не приводящие к быстрому качественному скачку.' },
+      { id: '19', question: 'Что такое революция?', answer: 'Коренные, скачкообразные изменения всех или большинства сторон общественной жизни.' },
+      { id: '20', question: 'Что такое реформа?', answer: 'Целенаправленное преобразование какой-либо стороны общественной жизни, проводимое государственной властью.' },
+      { id: '21', question: 'В чем заключается противоречивость общественного прогресса?', answer: 'Развитие в одной сфере может сопровождаться деградацией в другой (например, рост технологий и ухудшение экологии).' },
+      { id: '22', question: 'Что такое глобализация?', answer: 'Процесс всемирной экономической, политической и культурной интеграции и унификации.' },
+      { id: '23', question: 'Назовите позитивные последствия глобализации.', answer: 'Доступ к информации, объединение усилий для решения проблем, развитие международной торговли.' },
+      { id: '24', question: 'Назовите негативные последствия глобализации.', answer: 'Утрата культурной специфики, зависимость экономик, рост разрыва между богатыми и бедными странами.' },
+      { id: '25', question: 'Что такое глобальные проблемы?', answer: 'Совокупность проблем человечества, от решения которых зависит существование цивилизации.' },
+      { id: '26', question: 'Назовите основные виды глобальных проблем.', answer: 'Экологические, демографические, угроза ядерной войны, международный терроризм, проблема «Север-Юг».' },
+      { id: '27', question: 'В чем проявляется проблема «Север-Юг»?', answer: 'В сильном экономическом разрыве между развитыми странами Севера и развивающимися странами Юга.' },
+      { id: '28', question: 'Кто такой индивид?', answer: 'Единичный представитель человеческого рода, носитель биологических качеств.' },
+      { id: '29', question: 'Что такое индивидуальность?', answer: 'Неповторимое своеобразие проявлений человека, подчеркивающее его исключительность.' },
+      { id: '30', question: 'Кто такой личность?', answer: 'Индивид, обладающий совокупностью социально значимых качеств, которые он реализует в общественной жизни.' },
+      { id: '31', question: 'Что такое социализация?', answer: 'Процесс усвоения индивидом социальных норм, культурных ценностей и образцов поведения общества.' },
+      { id: '32', question: 'Кто такие агенты социализации?', answer: 'Люди, социальные группы, учреждения и организации, ответственные за воспитание и обучение.' },
+      { id: '33', question: 'Приведите примеры агентов первичной социализации.', answer: 'Семья, близкие друзья, школьные учителя.' },
+      { id: '34', question: 'Приведите примеры агентов вторичной социализации.', answer: 'Администрация школы или университета, руководство на работе, государство, СМИ.' },
+      { id: '35', question: 'Что такое потребность?', answer: 'Переживаемая и осознаваемая человеком нужда в том, что необходимо для поддержания его организма и развития личности.' },
+      { id: '36', question: 'Какие выделяют три основные группы потребностей?', answer: 'Биологические (материальные), социальные, духовные (идеальные).' },
+      { id: '37', question: 'Приведите примеры биологических потребностей.', answer: 'Пища, вода, сон, дыхание, тепло, самосохранение.' },
+      { id: '38', question: 'Приведите примеры социальных потребностей.', answer: 'Общение, труд, общественное признание, принадлежность к определенной группе.' },
+      { id: '39', question: 'Приведите примеры духовных потребностей.', answer: 'Познание, творчество, поиск смысла жизни, самореализация.' },
+      { id: '40', question: 'Что такое мнимые (ложные) потребности?', answer: 'Потребности, удовлетворение которых ведет к физической и духовной деградации личности (алкоголь, наркотики).' },
+      { id: '41', question: 'Что такое деятельность?', answer: 'Специфический вид человеческой активности, направленный на преобразование окружающего мира и самого себя.' },
+      { id: '42', question: 'Назовите основные структурные элементы деятельности.', answer: 'Субъект, объект, мотив, цель, средства, процесс, результат.' },
+      { id: '43', question: 'Кто такой субъект деятельности?', answer: 'Тот, кто осуществляет деятельность (человек, социальная группа, общество в целом).' },
+      { id: '44', question: 'Что такое объект деятельности?', answer: 'То, на что направлена деятельность (предметы, процессы, другие люди).' },
+      { id: '45', question: 'Что такое мотив деятельности?', answer: 'То, что побуждает человека к деятельности (потребности, интересы, убеждения, идеалы).' },
+      { id: '46', question: 'Что такое цель деятельности?', answer: 'Осознанный образ желаемого (предвосхищаемого) результата.' },
+      { id: '47', question: 'Назовите основные виды деятельности.', answer: 'Игра, учение (познание), труд, общение.' },
+      { id: '48', question: 'В чем особенность игры как вида деятельности?', answer: 'Ориентация не на результат, а на сам процесс, наличие условной воображаемой ситуации и строгих правил.' },
+      { id: '49', question: 'Какова главная цель учения как вида деятельности?', answer: 'Приобретение человеком новых знаний, умений и навыков.' },
+      { id: '50', question: 'Что отличает труд от других видов деятельности?', answer: 'Направленность на достижение практически полезного результата, создание материальных и духовных благ.' },
+      { id: '51', question: 'Что такое общение?', answer: 'Вид деятельности, при котором происходит обмен информацией, идеями, эмоциями и оценками между людьми.' },
+      { id: '52', question: 'Что такое познание?', answer: 'Процесс постижения действительности, накопления и осмысления данных, полученных в опыте взаимодействия человека с окружающим миром.' },
+      { id: '53', question: 'Назовите два уровня (этапа) познания.', answer: 'Чувственное и рациональное познание.' },
+      { id: '54', question: 'Каковы формы чувственного познания?', answer: 'Ощущение, восприятие, представление.' },
+      { id: '55', question: 'Что такое ощущение?', answer: 'Отражение отдельных свойств предмета, воздействующего в данный момент на органы чувств.' },
+      { id: '56', question: 'Что такое восприятие?', answer: 'Целостный чувственный образ предмета, воздействующего в данный момент на органы чувств.' },
+      { id: '57', question: 'Что такое представление?', answer: 'Чувственно-наглядный образ предмета, сохраняемый в памяти без его непосредственного воздействия на органы чувств.' },
+      { id: '58', question: 'Каковы формы рационального познания?', answer: 'Понятие, суждение, умозаключение.' },
+      { id: '59', question: 'Что такое понятие?', answer: 'Мысль, фиксирующая общие и существенные признаки вещей и явлений.' },
+      { id: '60', question: 'Что такое суждение?', answer: 'Мысль, утверждающая или отрицающая что-либо об объекте познания.' },
+      { id: '61', question: 'Что такое умозаключение?', answer: 'Мысленная связь нескольких суждений и выведение из них логическим путем нового суждения (вывода).' },
+      { id: '62', question: 'Что такое истина?', answer: 'Знание, соответствующее свойствам познаваемого предмета, адекватное объективное отражение действительности.' },
+      { id: '63', question: 'В чем разница между абсолютной и относительной истиной?', answer: 'Абсолютная – исчерпывающее, неизменное знание. Относительная – точное при определенных условиях, но ограниченное знание, которое может дополняться в будущем.' },
+      { id: '64', question: 'Назовите основной критерий истины.', answer: 'Общественная практика (опыт, эксперимент).' },
+      { id: '65', question: 'Что такое культура в широком смысле?', answer: 'Всё, что создано человечеством в период его жизнедеятельности, все виды преобразовательной деятельности и её результаты.' },
+      { id: '66', question: 'На какие две формы делится культура по своему характеру?', answer: 'Материальная и духовная культура.' },
+      { id: '67', question: 'Что относится к материальной культуре?', answer: 'Техника, здания, одежда, орудия труда (все осязаемые результаты деятельности).' },
+      { id: '68', question: 'Что относится к духовной культуре?', answer: 'Идеи, знания, верования, ценности, правила (все неосязаемые результаты деятельности).' },
+      { id: '69', question: 'Назовите три типа культуры по уровню аудитории.', answer: 'Элитарная, массовая, народная культура.' },
+      { id: '70', question: 'Для какой культуры характерны анонимность творцов и устная передача из поколения в поколение?', answer: 'Для народной культуры.' },
+      { id: '71', question: 'Какая культура ориентирована на коммерческий успех и стандартизацию?', answer: 'Массовая культура (поп-культура).' },
+      { id: '72', question: 'Что такое мораль?', answer: 'Специфический способ регулирования общественной жизни с позиций гуманизма, добра и справедливости.' },
+      { id: '73', question: 'Как звучит «золотое правило нравственности»?', answer: '«Относись к другим людям так, как хочешь, чтобы они относились к тебе».' },
+      { id: '74', question: 'Назовите три отличия морали от права.', answer: 'неписаный характер, создается обществом (а не государством), не имеет строгой юридической ответственности за нарушение.' },
+      { id: '75', question: 'В чем заключается оценочная функция морали?', answer: 'В способности давать характеристику поступкам людей с точки зрения добра и зла.' },
+      { id: '76', question: 'Что такое «социальные санкции»?', answer: 'Меры одобрения или порицания (позитивные и негативные), применяемые обществом для регуляции поведения индивида.' },
+      { id: '77', question: 'Дайте определение религии.', answer: 'Это форма духовной культуры и мировоззрение, основанное на вере в существование сверхъестественных сил.' },
+      { id: '78', question: 'Назовите три мировые религии.', answer: 'буддизм, христианство и ислам.' },
+      { id: '79', question: 'Чем монотеистические религии отличаются от политеистических?', answer: 'Монотеизм – это вера в одного Бога, политеизм – вера во многих богов.' },
+      { id: '80', question: 'Является ли буддизм монотеистической религией?', answer: 'Нет, буддизм не признает Бога-творца; Будда является духовным учителем, а не Богом.' },
+      { id: '81', question: 'В чем заключается компенсаторная функция религии?', answer: 'В оказании психологической помощи, дарении надежды и утешения в трудные моменты жизни.' },
+      { id: '82', question: 'Что такое «конфессия»?', answer: 'Это отдельное направление или школа внутри одной конкретной религии (например, православие, католицизм и протестантизм в христианстве).' }
+    ];
+
+    // Состояние приложения
+    let cards = [...defaultCards];
+    let learnedIds = new Set();
+    let activeTab = 'all';
+    let currentIndex = 0;
+    let isFlipped = false;
+    let theme = 'light';
+
+    // DOM-элементы
+    const els = {
+      cardWrapper: document.getElementById('card-wrapper'),
+      cardQuestion: document.getElementById('card-question'),
+      cardAnswer: document.getElementById('card-answer'),
+      tabAll: document.getElementById('tab-all'),
+      tabLearning: document.getElementById('tab-learning'),
+      tabLearned: document.getElementById('tab-learned'),
+      statusText: document.getElementById('status-text'),
+      btnCheck: document.getElementById('btn-check'),
+      themeIconUse: document.getElementById('theme-icon-use'),
+      btnTheme: document.getElementById('btn-theme'),
+      fileStatusText: document.getElementById('file-status-text'),
+      fileInput: document.getElementById('file-input'),
+      btnUpload: document.getElementById('btn-upload'),
+      emptyState: document.getElementById('empty-state'),
+      mainContent: document.getElementById('main-content'),
+      btnNext: document.getElementById('btn-next'),
+      btnPrev: document.getElementById('btn-prev'),
+      btnShuffle: document.getElementById('btn-shuffle')
+    };
+
+    // Фильтрация
+    function getFilteredCards() {
+      return cards.filter(card => {
+        if (activeTab === 'learned') return learnedIds.has(card.id);
+        if (activeTab === 'learning') return !learnedIds.has(card.id);
+        return true;
+      });
+    }
+
+    // Обновление интерфейса
+    function updateUI() {
+      // Обновляем счетчики на вкладках
+      els.tabAll.textContent = `Все термины (${cards.length})`;
+      els.tabLearning.textContent = `Осталось выучить (${cards.length - learnedIds.size})`;
+      els.tabLearned.textContent = `Выученные (${learnedIds.size})`;
+
+      const filtered = getFilteredCards();
+
+      if (filtered.length === 0) {
+        els.mainContent.style.display = 'none';
+        els.emptyState.style.display = 'block';
+      } else {
+        els.mainContent.style.display = 'flex';
+        els.emptyState.style.display = 'none';
+
+        // Корректировка индекса, если он вышел за пределы
+        if (currentIndex >= filtered.length) currentIndex = 0;
+
+        const currentCard = filtered[currentIndex];
+        els.cardQuestion.textContent = currentCard.question;
+        els.cardAnswer.textContent = currentCard.answer;
+        els.statusText.textContent = `Карточка ${currentIndex + 1} из ${filtered.length}`;
+
+        // Статус "Выучено"
+        if (learnedIds.has(currentCard.id)) {
+          els.btnCheck.classList.add('active');
+          els.btnCheck.title = 'Убрать из выученных';
+        } else {
+          els.btnCheck.classList.remove('active');
+          els.btnCheck.title = 'Отметить как выученное';
+        }
+      }
+    }
+
+    // Обработчики вкладок
+    function switchTab(tabId) {
+      activeTab = tabId;
+      currentIndex = 0;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      
+      updateUI();
+    }
+
+    els.tabAll.addEventListener('click', () => switchTab('all'));
+    els.tabLearning.addEventListener('click', () => switchTab('learning'));
+    els.tabLearned.addEventListener('click', () => switchTab('learned'));
+
+    // Переворот карточки
+    els.cardWrapper.addEventListener('click', () => {
+      isFlipped = !isFlipped;
+      els.cardWrapper.classList.toggle('flipped', isFlipped);
+    });
+
+    // Навигация
+    els.btnNext.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % filtered.length;
+        updateUI();
+      }, 150);
+    });
+
+    els.btnPrev.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      setTimeout(() => {
+        currentIndex = (currentIndex - 1 + filtered.length) % filtered.length;
+        updateUI();
+      }, 150);
+    });
+
+    els.btnShuffle.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length <= 1) return;
+      isFlipped = false;
+      els.cardWrapper.classList.remove('flipped');
+      setTimeout(() => {
+        // Перемешиваем массив карточек
+        cards.sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        updateUI();
+      }, 150);
+    });
+
+    els.btnCheck.addEventListener('click', () => {
+      const filtered = getFilteredCards();
+      if (filtered.length === 0) return;
+      const currentCard = filtered[currentIndex];
+      
+      if (learnedIds.has(currentCard.id)) {
+        learnedIds.delete(currentCard.id);
+      } else {
+        learnedIds.add(currentCard.id);
+      }
+      updateUI();
+    });
+
+    // Темная тема
+    els.btnTheme.addEventListener('click', () => {
+      theme = theme === 'light' ? 'dark' : 'light';
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        els.themeIconUse.setAttribute('href', '#icon-sun');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        els.themeIconUse.setAttribute('href', '#icon-moon');
+      }
+    });
+
+    // Загрузка файла
+    els.btnUpload.addEventListener('click', () => els.fileInput.click());
+    
+    els.fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        const parsed = parseCSV(text);
+        if (parsed.length > 0) {
+          cards = parsed;
+          learnedIds.clear();
+          currentIndex = 0;
+          isFlipped = false;
+          els.cardWrapper.classList.remove('flipped');
+          els.fileStatusText.textContent = `Загружен файл: ${file.name}`;
+          updateUI();
+        } else {
+          alert('Не удалось распознать карточки.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Парсер CSV
+    function parseCSV(text) {
+      const result = [];
+      let row = [];
+      let inQuotes = false;
+      let currentVal = '';
+      
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (inQuotes) {
+          if (char === '"' && text[i + 1] === '"') {
+            currentVal += '"';
+            i++;
+          } else if (char === '"') {
+            inQuotes = false;
+          } else {
+            currentVal += char;
+          }
+        } else {
+          if (char === '"') {
+            inQuotes = true;
+          } else if (char === ',') {
+            row.push(currentVal.trim());
+            currentVal = '';
+          } else if (char === '\n' || char === '\r') {
+            row.push(currentVal.trim());
+            if (row.length >= 2 && row[0] && row[1]) {
+              result.push({ id: Date.now() + Math.random().toString(), question: row[0], answer: row[1] });
+            }
+            row = [];
+            currentVal = '';
+            if (char === '\r' && text[i + 1] === '\n') i++;
+          } else {
+            currentVal += char;
+          }
+        }
+      }
+      if (currentVal || row.length > 0) {
+        row.push(currentVal.trim());
+        if (row.length >= 2 && row[0] && row[1]) {
+          result.push({ id: Date.now() + Math.random().toString(), question: row[0], answer: row[1] });
+        }
+      }
+      return result;
+    }
+
+    // Инициализация при старте
+    updateUI();
+  </script>
+</body>
+</html>
